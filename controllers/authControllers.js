@@ -7,7 +7,7 @@ import userModel from "../models/userModel.js";
 
 // user signup
 export const signUp = async (req, res) => {
-    const data =  userModel.find({})
+    const data =  await userModel.find({})
     res.send({message: data})
     // try {
     //     const { username, identifier, password } = req.body;
