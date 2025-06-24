@@ -1,13 +1,14 @@
 import userModel from "../models/userModel.js";
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import otpModel from "../models/otpModel.js";
-import nodemailer from "nodemailer";
-import crypto from "crypto";
+// import bcrypt from 'bcryptjs';
+// import jwt from 'jsonwebtoken';
+// import otpModel from "../models/otpModel.js";
+// import nodemailer from "nodemailer";
+// import crypto from "crypto";
 
 // user signup
 export const signUp = async (req, res) => {
-    res.res({message: 'ok'})
+    // const data =  userModel.find({})
+    res.send({message: data})
     // try {
     //     const { username, identifier, password } = req.body;
 

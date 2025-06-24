@@ -69,7 +69,7 @@ app.post('/signup', async (req, res) => {
     }
 })
 
-app.use('/api/auth', authRouter)
+app.use('/api/', authRouter)
 
 app.listen(port, ()=>{
     console.log(`Server is running on http://localhost:${port}`);
