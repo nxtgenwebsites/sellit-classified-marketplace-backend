@@ -193,3 +193,30 @@ export const verifyOtp = async (req, res) => {
         res.status(500).json({ message: "OTP verification failed" });
     }
 };
+
+// Reset Password
+export const resetPassword = async (req, res) => {
+    try {
+        const { identifier, newPassword } = req.body;
+
+        // Check if user exists
+        const user = await userModel.findOne({ identifier });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Hash the new password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        // Update password
+        user.password = hashedPassword;
+        await user.save();
+
+        res.status(200).json({ message: 'Password updated successfully' });
+
+    } catch (error) {
+        console.error('Reset Password Error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
