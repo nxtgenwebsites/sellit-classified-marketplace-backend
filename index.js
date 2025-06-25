@@ -16,7 +16,7 @@ app.use(cors())
 app.use(bodyParser.json());
 
 
-app.use('/api', authRouter)
+app.use('/api/auth', authRouter)
 
 app.get('/' , async (req , res) =>{
         const usersData = await userModel.find({})

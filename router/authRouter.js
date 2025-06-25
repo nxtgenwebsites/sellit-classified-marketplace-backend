@@ -1,6 +1,5 @@
 import express from 'express';
-// import { sendOtp, signIn, signUp, verifyOtp } from '../controllers/authControllers.js';
-import { signUp } from '../controllers/authControllers.js';
+import { sendOtp, signIn, signUp, verifyOtp } from '../controllers/authControllers.js';
 
 
 const authRouter = express.Router();
@@ -9,12 +8,12 @@ const authRouter = express.Router();
 authRouter.post('/signup', signUp);
 
 // Login route
-// authRouter.post('/signin', signIn);
+authRouter.post('/signin', signIn);
 
-// // Send OTP
-// authRouter.post('/send-otp', sendOtp);
+// Send OTP
+authRouter.post('/send-otp', sendOtp);
 
-// // Verify OTP
-// authRouter.post('/verify-otp', verifyOtp);
+// Verify OTP
+authRouter.post('/verify-otp', verifyOtp);
 
 export default authRouter;
