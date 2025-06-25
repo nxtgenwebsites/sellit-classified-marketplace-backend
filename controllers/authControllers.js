@@ -7,59 +7,57 @@ import userModel from "../models/userModel.js";
 
 // user signup
 export const signUp = async (req, res) => {
-    const data =  await userModel.find({})
-    res.send({message: data})
-    // try {
-    //     const { username, identifier, password } = req.body;
+    try {
+        const { username, identifier, password } = req.body;
 
-    //     // Check if user already exists
-    //     const userExists = await userModel.findOne({ identifier });
+        // Check if user already exists
+        const userExists = await userModel.findOne({ identifier });
 
-    //     if (userExists) {
-    //         return res.status(409).json({ message: 'User already exists' });
-    //     }
+        if (userExists) {
+            return res.status(409).json({ message: 'User already exists' });
+        }
 
-    //     // Check if username already exists
-    //     const usernameExists = await userModel.findOne({ username });
+        // Check if username already exists
+        const usernameExists = await userModel.findOne({ username });
 
-    //     if (usernameExists) {
-    //         return res.status(409).json({ message: 'Username already exists' });
-    //     }
+        if (usernameExists) {
+            return res.status(409).json({ message: 'Username already exists' });
+        }
 
-    //     // Hash password
-    //     const salt = await bcrypt.genSalt(10);
-    //     const hashedPassword = await bcrypt.hash(password, salt);
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-    //     // Create new user
-    //     const newUser = new userModel({
-    //         username,
-    //         identifier,
-    //         password: hashedPassword,
-    //     });
+        // Create new user
+        const newUser = new userModel({
+            username,
+            identifier,
+            password: hashedPassword,
+        });
 
-    //     await newUser.save();
+        await newUser.save();
 
-    //     // Generate JWT token
-    //     const token = jwt.sign(
-    //         { id: newUser._id },
-    //         '6B#zj$49@qzFv^L2pH7!xK$mWp3!rQd9vNcEjwA2',
-    //         { expiresIn: '30d' }
-    //     );
+        // Generate JWT token
+        const token = jwt.sign(
+            { id: newUser._id },
+            '6B#zj$49@qzFv^L2pH7!xK$mWp3!rQd9vNcEjwA2',
+            { expiresIn: '30d' }
+        );
 
-    //     res.status(201).json({
-    //         message: 'User registered successfully',
-    //         token,
-    //         user: {
-    //             id: newUser._id,
-    //             username: newUser.username,
-    //             identifier: newUser.identifier,
-    //         },
-    //     });
+        res.status(201).json({
+            message: 'User registered successfully',
+            token,
+            user: {
+                id: newUser._id,
+                username: newUser.username,
+                identifier: newUser.identifier,
+            },
+        });
 
-    // } catch (error) {
-    //     console.error(error);
-    //     res.status(500).json({ message: 'Server error'});
-    // }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error'});
+    }
 };
 
 // user signin
