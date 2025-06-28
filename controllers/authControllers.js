@@ -4,6 +4,17 @@ import jwt from 'jsonwebtoken';
 import otpModel from "../models/otpModel.js";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
+import { OAuth2Client } from 'google-auth-library';
+
+function generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
+}
+
+// Helper to generate random password
+const randomPassword = () => Math.random().toString(36).slice(-8);
+
+const client = new OAuth2Client('748553911845-pp4s8hkmuntilsvak0ks7t0lv7c4febn.apps.googleusercontent.com');
+
 
 // user signup
 export const signUp = async (req, res) => {
@@ -100,9 +111,6 @@ export const signIn = async (req, res) => {
     }
 };
 
-function generateOTP() {
-    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
-}
 
 // Send OTP
 export const sendOtp = async (req, res) => {
@@ -218,5 +226,40 @@ export const resetPassword = async (req, res) => {
     } catch (error) {
         console.error('Reset Password Error:', error);
         res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const googleLogin = async (req, res) => {
+    const { token } = req.body;
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const { email, name } = ticket.getPayload();
+
+        let user = await userModel.findOne({ email });
+
+        if (!user) {
+            const hashedPassword = await randomPassword();
+
+            user = await userModel.create({
+                username: name,
+                identifier: email, // 👈 add this line
+                password: hashedPassword,
+                isActive: true,
+            });
+        }
+
+        const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: '7d',
+        });
+
+        res.json({ token: jwtToken, user });
+    } catch (err) {
+        console.error(err);
+        res.status(401).json({ message: 'Invalid Google token' });
     }
 };

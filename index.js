@@ -17,6 +17,12 @@ app.use(bodyParser.json());
 
 app.use('/api/auth', authRouter)
 
+app.get("/data-deletion", (req, res) => {
+    return res.send(`
+    <h2>Data Deletion Instructions</h2>
+    <p>If you want your data to be deleted from our platform, please email us at <strong>sellit.classified.team@gmail.com</strong> with your Facebook ID or login email.</p>
+  `);
+});
 
 app.listen(port, ()=>{
     console.log(`Server is running on http://localhost:${port}`);
