@@ -13,8 +13,23 @@ function generateOTP() {
 // Helper to generate random password
 const randomPassword = () => Math.random().toString(36).slice(-8);
 
-const client = new OAuth2Client('748553911845-pp4s8hkmuntilsvak0ks7t0lv7c4febn.apps.googleusercontent.com');
+// Generate a unique username
+const generateUniqueUsername = async (baseName) => {
+    baseName = baseName.toLowerCase().replace(/\s+/g, '');
+    let username;
+    let isUnique = false;
 
+    while (!isUnique) {
+        const randomNum = Math.floor(100 + Math.random() * 900); // 3-digit
+        username = `${baseName}${randomNum}`;
+        const existing = await userModel.findOne({ username });
+        if (!existing) isUnique = true;
+    }
+
+    return username;
+};
+
+const client = new OAuth2Client('748553911845-pp4s8hkmuntilsvak0ks7t0lv7c4febn.apps.googleusercontent.com');
 
 // user signup
 export const signUp = async (req, res) => {
@@ -110,7 +125,6 @@ export const signIn = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
-
 
 // Send OTP
 export const sendOtp = async (req, res) => {
@@ -239,15 +253,16 @@ export const googleLogin = async (req, res) => {
         });
 
         const { email, name } = ticket.getPayload();
-
-        let user = await userModel.findOne({ email });
+        let user = await userModel.findOne({ identifier: email });
 
         if (!user) {
-            const hashedPassword = await randomPassword();
+            const username = await generateUniqueUsername(name);
+            const plainPassword = randomPassword();
+            const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
             user = await userModel.create({
-                username: name,
-                identifier: email, // 👈 add this line
+                username,
+                identifier: email,
                 password: hashedPassword,
                 isActive: true,
             });
@@ -257,9 +272,16 @@ export const googleLogin = async (req, res) => {
             expiresIn: '7d',
         });
 
-        res.json({ token: jwtToken, user });
+        res.status(200).json({
+            token: jwtToken,
+            user: {
+                _id: user._id,
+                username: user.username,
+                identifier: user.identifier,
+            }
+        });
     } catch (err) {
-        console.error(err);
+        console.error('Google login error:', err.message);
         res.status(401).json({ message: 'Invalid Google token' });
     }
 };
